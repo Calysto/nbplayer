@@ -29,6 +29,7 @@ In [0]:
 
 MNIST.ipynb [0/84] > 
 ```
+The prompt is composed of the name of the notebook, and the current cell/total cells.
 
 If you press enter, then you will execute that cell (if it is code) and then go to the next cell.
 
@@ -42,6 +43,7 @@ MNIST.ipynb [1/84] >
 
 At the prompt, you can enter any of the following:
 
+* python expressions or statements
 * empty line - execute current cell and advance
 * n - goto next cell (skip this cell)
 * p - goto previous cell
