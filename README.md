@@ -43,7 +43,7 @@ MNIST.ipynb [1/84] >
 
 At the prompt, you can enter any of the following:
 
-* python expressions or statements
+* kernal language expressions or statements
 * empty line - execute current cell and advance
 * n - goto next cell (skip this cell)
 * p - goto previous cell
