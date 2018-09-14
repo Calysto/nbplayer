@@ -1,0 +1,6 @@
+#!/usr/bin/env python
+
+import nbplayer
+import sys
+
+nbplayer.main(*sys.argv[1:])
