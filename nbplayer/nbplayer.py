@@ -3,12 +3,14 @@ A Jupyter notebook console executer.
 
 """
 
+from IPython.utils.capture import capture_output
+import jupyter_client
 import nbformat
 import cmd
 import sys
 import os
 
-__version__ = "0.0.0"
+TIMEOUT = 30
 
 help_text = """
 nbplayer
@@ -28,6 +30,7 @@ A simple terminal player for Jupyter notebooks
 
 Possible future options:
 
+* re search forward/reverse for cell with next match
 * run all code cells up to here
 * i - insert cell
 * d - delete cell
@@ -42,12 +45,14 @@ class TerminalNBPlayer(cmd.Cmd):
     def __init__(self, filename, goto=0):
         super().__init__()
         self.filename = filename
-        self.nb = nbformat.read(filename, as_version=4)
-        self.current_cell = goto
+        self.current_cell = int(goto)
         self.environment = {}
         self.goto = None
         self.max_col_width = 72
         self.max_rows = 40
+        self.nb = nbformat.read(filename, as_version=4)
+        kernel_name = self.nb["metadata"]["kernelspec"]["name"]
+        self.manager, self.client = jupyter_client.manager.start_new_kernel(kernel_name=kernel_name)
 
     @property
     def prompt(self):
@@ -55,6 +60,7 @@ class TerminalNBPlayer(cmd.Cmd):
         return "%s [%s/%s] > " % (filename, self.current_cell, len(self.nb.cells))
 
     def preloop(self):
+        from ._version import __version__
         print('nbplayer %s: type `help` or `?` to see commands\n' % __version__)
         print("Viewing: %s" % self.filename)
         print("--------------------------------------------------------\n")
@@ -86,15 +92,11 @@ class TerminalNBPlayer(cmd.Cmd):
         self.show_current_cell()
 
     def execute_code(self, source):
-        try:
-            code = compile(source, "<string>", "eval")
-        except:
-            code = compile(source, "<string>", "exec")
-        try:
-            results = eval(code, self.environment)
-        except:
-            print("FIXME: show traceback")
-            results = None
+        with capture_output() as io:
+            reply = self.client.execute_interactive(source, timeout=TIMEOUT)
+        print(io.stdout)
+        # reply['content']['status'] == 'ok'
+        results = None ## FIXME: how to get output from capture_output()?
         return results
         
     def emptyline(self): ## this is needed to override default behavior
@@ -151,6 +153,9 @@ class TerminalNBPlayer(cmd.Cmd):
         self.goto = self.current_cell - 1
 
     def do_q(self, arg):
+        self.client.stop_channels()
+        self.manager.shutdown_kernel()
+        print()
         print("To continue: nbplayer %s %s" % (self.filename, self.current_cell))
         return True
     
