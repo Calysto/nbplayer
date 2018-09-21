@@ -94,7 +94,10 @@ class TerminalNBPlayer(cmd.Cmd):
     def execute_code(self, source):
         with capture_output() as io:
             reply = self.client.execute_interactive(source, timeout=TIMEOUT)
-        print(io.stdout)
+        print(io.stdout, file=sys.stdout)
+        sys.stdout.flush()
+        print(io.stderr, file=sys.stderr)
+        sys.stderr.flush()
         # reply['content']['status'] == 'ok'
         results = None ## FIXME: how to get output from capture_output()?
         return results
