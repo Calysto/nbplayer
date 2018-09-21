@@ -11,7 +11,7 @@ $ nbplayer conx-notebooks/MNIST.ipynb
 nbplayer 0.0.0: type `help` or `?` to see commands
 ```
 
-The first cell of the notebook will show in the In[0] area, followed by the nbviewer prompt:
+The first cell of the notebook will show in the In[0] area, followed by the nbplayer prompt:
 
 ```shell
 Viewing: conx-notebooks/MNIST.ipynb
